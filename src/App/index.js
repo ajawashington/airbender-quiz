@@ -1,36 +1,36 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './App.scss';
+import getQuestions from '../helpers/data/avatarData';
 
 function App() {
-  const [domWriting, setDomWriting] = useState('Nothing Here!');
+  const [allQuestions, setAllQuestions] = useState([]);
+  const [singleQuestion, setSingleQuestion] = useState({});
+  const [showAnswer, setShowAnswer] = useState(false);
 
-  const handleClick = (e) => {
-    console.warn(`You clicked ${e.target.id}`);
-    setDomWriting(`You clicked ${e.target.id}! Check the Console!`);
+  useEffect(() => {
+    getQuestions()
+      .then((questions) => {
+        setAllQuestions(questions);
+        setSingleQuestion(questions[Math.floor(Math.random() * questions.length)]);
+      });
+  }, []);
+
+  const handleClick = () => {
+    if (showAnswer) {
+      setShowAnswer(false);
+      setSingleQuestion(allQuestions[Math.floor(Math.random() * allQuestions.length)]);
+    } else {
+      setShowAnswer(true);
+    }
   };
 
   return (
     <div className='App'>
-      <h2>INSIDE APP COMPONENT</h2>
-      <div>
-        <button
-          id='this-button'
-          className='btn btn-info'
-          onClick={handleClick}
-        >
-          I am THIS button
-        </button>
-      </div>
-      <div>
-        <button
-          id='that-button'
-          className='btn btn-primary mt-3'
-          onClick={handleClick}
-        >
-          I am THAT button
-        </button>
-      </div>
-      <h3>{domWriting}</h3>
+      <h1>{singleQuestion.question}</h1>
+      <p>{showAnswer && singleQuestion.correctAnswer}</p>
+      <button onClick={handleClick}>
+        {showAnswer ? 'Get Another Question' : 'Get Answer'}
+      </button>
     </div>
   );
 }
